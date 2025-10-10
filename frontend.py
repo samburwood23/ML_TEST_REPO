@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Workplace Stress & DEI Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .dataset-info {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin: 5px;
+            font-size: 12px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-indicator.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-indicator.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+        }
+
+        .status-dot.disconnected {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .inputs-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .input-info {
+            font-size: 12px;
+            color: #888;
+            font-style: italic;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #764ba2;
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 8px;
+        }
+
+        .value-unit {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 11px;
+            color: #999;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .metric-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .risk-low {
+            color: #28a745;
+        }
+
+        .risk-moderate {
+            color: #ffc107;
+        }
+
+        .risk-high {
+            color: #dc3545;
+        }
+
+        .dei-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .dei-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .dei-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .dei-item-label {
+            font-size: 12px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .dei-item-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .recommendations {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        .recommendations h3 {
+            color: #856404;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .recommendation-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .rec-category {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .rec-action {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .rec-impact {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .impact-critical {
+            background: #dc3545;
+            color: white;
+        }
+
+        .impact-high {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .impact-medium {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .impact-low {
+            background: #28a745;
+            color: white;
+        }
+
+        .workplace-factors {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .workplace-factors h3 {
+            color: #004085;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .factors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .factor-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .factor-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .factor-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #004085;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👩‍💼 Women's Workplace Stress & DEI Analysis</h1>
+            <p class="subtitle">Fuzzy Logic System for Mental Health Assessment in Tech Workplaces</p>
+            <div class="dataset-info">
+                📊 Based on Mental Health in Tech Survey (2014)
+                <div>
+                    <span class="info-badge">Gender Focus</span>
+                    <span class="info-badge">DEI Metrics</span>
+                    <span class="info-badge">Stress Detection</span>
+                    <span class="info-badge">Burnout Prevention</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-indicator" id="statusIndicator">
+            <div class="status-dot"></div>
+            <span id="statusText">Checking connection...</span>
+        </div>
+
+        <div class="inputs-section">
+            <div class="section-title">📝 Workplace Assessment Inputs</div>
+
+            <div class="input-group">
+                <div class="input-header">
+                    <label for="workHours">Work Hours per Week</label>
+                    <span class="input-info">Standard: 40hrs | Excessive: 55+hrs</span>
+                </div>
+                <input type="range" id="workHours" min="20" max="80" value="40" step="1">
+                <div class="value-display">
+                    <span id="workHoursValue">40</span>
+                    <span class="value-unit">hours/week</span>
+                </div>
+                <div class="scale-labels">
+                    <span>20</span>
+                    <span>50</span>
+                    <span>80</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-header">
+                    <label for="deiSupport">Company DEI Support Quality</label>
+                    <span class="input-info">0 = None | 10 = Excellent</span>
+                </div>
+                <input type="range" id="deiSupport" min="0" max="10" value="5" step="1">
+                <div class="value-display">
+                    <span id="deiSupportValue">5</span>
+                    <span class="value-unit">/ 10</span>
+                </div>
+                <div class="scale-labels">
+                    <span>Poor</span>
+                    <span>Moderate</span>
+                    <span>Excellent</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-header">
+                    <label for="remoteFlex">Remote Work Flexibility</label>
+                    <span class="input-info">0 = None | 10 = Full Remote</span>
+                </div>
+                <input type="range" id="remoteFlex" min="0" max="10" value="5" step="1">
+                <div class="value-display">
+                    <span id="remoteFlexValue">5</span>
+                    <span class="value-unit">/ 10</span>
+                </div>
+                <div class="scale-labels">
+                    <span>None</span>
+                    <span>Hybrid</span>
+                    <span>Full Remote</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-header">
+                    <label for="mentalHealth">Mental Health Benefits Quality</label>
+                    <span class="input-info">0 = None | 10 = Comprehensive</span>
+                </div>
+                <input type="range" id="mentalHealth" min="0" max="10" value="5" step="1">
+                <div class="value-display">
+                    <span id="mentalHealthValue">5</span>
+                    <span class="value-unit">/ 10</span>
+                </div>
+                <div class="scale-labels">
+                    <span>Inadequate</span>
+                    <span>Adequate</span>
+                    <span>Comprehensive</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-header">
+                    <label for="managerSupport">Manager Support Quality</label>
+                    <span class="input-info">0 = Unsupportive | 10 = Very Supportive</span>
+                </div>
+                <input type="range" id="managerSupport" min="0" max="10" value="5" step="1">
+                <div class="value-display">
+                    <span id="managerSupportValue">5</span>
+                    <span class="value-unit">/ 10</span>
+                </div>
+                <div class="scale-labels">
+                    <span>Unsupportive</span>
+                    <span>Neutral</span>
+                    <span>Supportive</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-header">
+                    <label for="discrimination">Gender Discrimination Experience</label>
+                    <span class="input-info">0 = None | 10 = Severe</span>
+                </div>
+                <input type="range" id="discrimination" min="0" max="10" value="2" step="1">
+                <div class="value-display">
+                    <span id="discriminationValue">2</span>
+                    <span class="value-unit">/ 10</span>
+                </div>
+                <div class="scale-labels">
+                    <span>Minimal</span>
+                    <span>Moderate</span>
+                    <span>Severe</span>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="analyzeStress()" id="analyzeBtn">
+            🔍 Analyze Workplace Stress & DEI Impact
+        </button>
+
+        <div class="error" id="errorMessage"></div>
+
+        <div class="result" id="result">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Overall Stress Level</div>
+                    <div class="metric-value" id="stressValue">0</div>
+                    <div class="metric-label" id="stressRisk">Low</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="stressBar" style="width: 0%; background: #28a745;"></div>
+                    </div>
+                    <div class="metric-description" id="stressDesc"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Burnout Risk</div>
+                    <div class="metric-value" id="burnoutValue">0</div>
+                    <div class="metric-label" id="burnoutLevel">Low</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="burnoutBar" style="width: 0%; background: #28a745;"></div>
+                    </div>
+                    <div class="metric-description" id="burnoutDesc"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-title">Intervention Priority</div>
+                    <div class="metric-value" id="interventionValue">0</div>
+                    <div class="metric-label" id="interventionUrgency">Low Priority</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="interventionBar" style="width: 0%; background: #28a745;"></div>
+                    </div>
+                    <div class="metric-description" id="interventionDesc"></div>
+                </div>
+            </div>
+
+            <div class="dei-section">
+                <h3>🎯 DEI Health Metrics</h3>
+                <div class="dei-grid">
+                    <div class="dei-item">
+                        <div class="dei-item-label">Overall DEI Health</div>
+                        <div class="dei-item-value" id="deiHealth">0</div>
+                    </div>
+                    <div class="dei-item">
+                        <div class="dei-item-label">Discrimination Impact</div>
+                        <div class="dei-item-value" id="discrimImpact">Minimal</div>
+                    </div>
+                    <div class="dei-item">
+                        <div class="dei-item-label">Support Adequacy</div>
+                        <div class="dei-item-value" id="supportAdequacy">Strong</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workplace-factors">
+                <h3>🏢 Workplace Environment Factors</h3>
+                <div class="factors-grid">
+                    <div class="factor-item">
+                        <div class="factor-label">Work Hours</div>
+                        <div class="factor-value" id="workHoursAssess">Standard</div>
+                    </div>
+                    <div class="factor-item">
+                        <div class="factor-label">Flexibility Rating</div>
+                        <div class="factor-value" id="flexRating">Moderate</div>
+                    </div>
+                    <div class="factor-item">
+                        <div class="factor-label">Benefits Adequacy</div>
+                        <div class="factor-value" id="benefitsAdequacy">Adequate</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="recommendations">
+                <h3>💡 Personalized Recommendations</h3>
+                <div id="recommendationsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+
+        // Update display values
+        const sliders = {
+            workHours: document.getElementById('workHours'),
+            deiSupport: document.getElementById('deiSupport'),
+            remoteFlex: document.getElementById('remoteFlex'),
+            mentalHealth: document.getElementById('mentalHealth'),
+            managerSupport: document.getElementById('managerSupport'),
+            discrimination: document.getElementById('discrimination')
+        };
+
+        sliders.workHours.addEventListener('input', (e) => {
+            document.getElementById('workHoursValue').textContent = e.target.value;
+        });
+
+        sliders.deiSupport.addEventListener('input', (e) => {
+            document.getElementById('deiSupportValue').textContent = e.target.value;
+        });
+
+        sliders.remoteFlex.addEventListener('input', (e) => {
+            document.getElementById('remoteFlexValue').textContent = e.target.value;
+        });
+
+        sliders.mentalHealth.addEventListener('input', (e) => {
+            document.getElementById('mentalHealthValue').textContent = e.target.value;
+        });
+
+        sliders.managerSupport.addEventListener('input', (e) => {
+            document.getElementById('managerSupportValue').textContent = e.target.value;
+        });
+
+        sliders.discrimination.addEventListener('input', (e) => {
+            document.getElementById('discriminationValue').textContent = e.target.value;
+        });
+
+        // Check API health
+        async function checkAPIHealth() {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                if (response.ok) {
+                    statusIndicator.className = 'status-indicator connected';
+                    statusIndicator.querySelector('.status-dot').className = 'status-dot connected';
+                    statusText.textContent = 'Connected to Python Backend';
+                    analyzeBtn.disabled = false;
+                } else {
+                    throw new Error('API not responding');
+                }
+            } catch (error) {
+                statusIndicator.className = 'status-indicator disconnected';
+                statusIndicator.querySelector('.status-dot').className = 'status-dot disconnected';
+                statusText.textContent = 'Backend Offline - Start Flask server';
+                analyzeBtn.disabled = true;
+            }
+        }
+
+        // Analyze stress
+        async function analyzeStress() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultDiv = document.getElementById('result');
+
+            resultDiv.classList.remove('show');
+            errorMessage.classList.remove('show');
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = 'Analyzing<span class="loading"></span>';
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        work_hours: parseFloat(sliders.workHours.value),
+                        dei_support: parseFloat(sliders.deiSupport.value),
+                        remote_flexibility: parseFloat(sliders.remoteFlex.value),
+                        mental_health_benefits: parseFloat(sliders.mentalHealth.value),
+                        manager_support: parseFloat(sliders.managerSupport.value),
+                        discrimination_exp: parseFloat(sliders.discrimination.value)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+
+                displayResults(data);
+
+            } catch (error) {
+                errorMessage.textContent = `Error: ${error.message}. Make sure the Flask server is running on port 5000.`;
+                errorMessage.classList.add('show');
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '🔍 Analyze Workplace Stress & DEI Impact';
+            }
+        }
+
+        function displayResults(data) {
+            const resultDiv = document.getElementById('result');
+            const { analysis, dei_metrics, workplace_factors, recommendations } = data;
+
+            // Display stress level
+            document.getElementById('stressValue').textContent = analysis.stress_level.score;
+            document.getElementById('stressRisk').textContent = analysis.stress_level.risk;
+            document.getElementById('stressRisk').className = `metric-label risk-${analysis.stress_level.risk.toLowerCase()}`;
+            document.getElementById('stressDesc').textContent = analysis.stress_level.description;
+            updateProgressBar('stressBar', analysis.stress_level.score, analysis.stress_level.risk);
+
+            // Display burnout risk
+            document.getElementById('burnoutValue').textContent = analysis.burnout_risk.score;
+            document.getElementById('burnoutLevel').textContent = analysis.burnout_risk.level;
+            document.getElementById('burnoutLevel').className = `metric-label risk-${analysis.burnout_risk.level.toLowerCase()}`;
+            document.getElementById('burnoutDesc').textContent = analysis.burnout_risk.description;
+            updateProgressBar('burnoutBar', analysis.burnout_risk.score, analysis.burnout_risk.level);
+
+            // Display intervention priority
+            document.getElementById('interventionValue').textContent = analysis.intervention_priority.score;
+            document.getElementById('interventionUrgency').textContent = analysis.intervention_priority.urgency;
+            document.getElementById('interventionDesc').textContent = analysis.intervention_priority.description;
+            updateProgressBar('interventionBar', analysis.intervention_priority.score, 
+                analysis.intervention_priority.urgency.includes('Urgent') ? 'High' : 
+                analysis.intervention_priority.urgency.includes('Medium') ? 'Moderate' : 'Low');
+
+            // Display DEI metrics
+            document.getElementById('deiHealth').textContent = dei_metrics.overall_dei_health;
+            document.getElementById('discrimImpact').textContent = dei_metrics.discrimination_impact;
+            document.getElementById('supportAdequacy').textContent = dei_metrics.support_adequacy;
+
+            // Display workplace factors
+            document.getElementById('workHoursAssess').textContent = workplace_factors.work_hours_assessment;
+            document.getElementById('flexRating').textContent = workplace_factors.flexibility_rating;
+            document.getElementById('benefitsAdequacy').textContent = workplace_factors.benefits_adequacy;
+
+            // Display recommendations
+            const recList = document.getElementById('recommendationsList');
+            recList.innerHTML = '';
+            recommendations.forEach(rec => {
+                const recItem = document.createElement('div');
+                recItem.className = 'recommendation-item';
+                recItem.innerHTML = `
+                    <div class="rec-category">${rec.category}</div>
+                    <div class="rec-action">${rec.action}</div>
+                    <span class="rec-impact impact-${rec.impact.toLowerCase()}">${rec.impact} Impact</span>
+                `;
+                recList.appendChild(recItem);
+            });
+
+            resultDiv.classList.add('show');
+        }
+
+        function updateProgressBar(barId, score, risk) {
+            const bar = document.getElementById(barId);
+            bar.style.width = `${score}%`;
+            
+            if (risk === 'Low') {
+                bar.style.background = '#28a745';
+            } else if (risk === 'Moderate') {
+                bar.style.background = '#ffc107';
+            } else {
+                bar.style.background = '#dc3545';
+            }
+        }
+
+        // Check API health when page loads
+        window.addEventListener('load', checkAPIHealth);
+
+        // Recheck connection every 30 seconds
+        setInterval(checkAPIHealth, 30000);
+    </script>
+</body>
+</html>
