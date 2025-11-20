@@ -6,6 +6,8 @@ import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 import pandas as pd
+from flask import render_template
+
 
 app = Flask(__name__)
 CORS(app)
